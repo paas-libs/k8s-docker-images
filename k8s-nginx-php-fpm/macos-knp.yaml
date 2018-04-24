@@ -1,0 +1,82 @@
+# KNP: Kubernetes + Nginx + PHP-FPM 
+
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: knp-deploy
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: knp
+  template:
+    metadata:
+      labels:
+        app: knp
+    spec:
+      containers:
+      - name: nginx
+        image: bg5hfc/nginx:np-alpine
+        ports:
+        - name: http-port
+          containerPort: 80
+          protocol: TCP
+        - name: https-port
+          containerPort: 443
+          protocol: TCP
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d
+        - name: nginx-log
+          mountPath: /var/log/nginx
+        - name: code-base
+          mountPath: /code-base
+        - name: project-base
+          mountPath: /project-base
+      - name: php-fpm
+        image: bg5hfc/php:np-alpine
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: code-base
+          mountPath: /code-base
+        - name: project-base
+          mountPath: /project-base
+      volumes:
+      - name: nginx-conf
+        hostPath:
+          path: /Development/Volumes/nginx-etc_nginx_conf.d
+      - name: nginx-log
+        hostPath:
+          path: /Development/Volumes/nginx-var_log_nginx
+      - name: code-base
+        hostPath:
+          path: /Development/Workbase/Code
+      - name: project-base
+        hostPath:
+          path: /Development/Projects
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: knp-svc
+spec:
+  selector:
+    app: knp
+  type: NodePort
+  ports:
+  - name: http-port
+    protocol: TCP
+    port: 80
+    nodePort: 30080
+    targetPort: 80
+  - name: https-port
+    protocol: TCP
+    port: 443
+    nodePort: 30443
+    targetPort: 443
