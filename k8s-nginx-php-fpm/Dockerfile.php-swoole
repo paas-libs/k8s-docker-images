@@ -1,0 +1,23 @@
+FROM php:cli
+
+RUN buildDeps='git libzip-dev' \
+  && apt-get update \
+  && apt-get install -y $buildDeps \
+  && pecl install swoole \
+  && docker-php-ext-install pdo_mysql \
+  && php -r "readfile('https://getcomposer.org/installer');" > /root/composer-installer.php \
+  && php /root/composer-installer.php --install-dir=/usr/local/bin --filename=composer \
+  && rm -f /root/composer-installer.php \
+  && composer config -g repo.packagist composer https://packagist.phpcomposer.com
+
+RUN echo "extension=swoole.so" >> /usr/local/etc/php/php.ini \
+  && echo "error_log=/var/log/php.log" >> /usr/local/etc/php/php.ini \
+  && echo "log_errors=On" >> /usr/local/etc/php/php.ini
+
+COPY src /var/www/app
+
+WORKDIR /var/www/app
+
+RUN composer install
+
+CMD [ "php", "/var/www/app/index.php" ]

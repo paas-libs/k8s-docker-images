@@ -1,0 +1,43 @@
+<?php
+// require dirname(__DIR__).'/bootstrap/autoload.php';
+
+// port 小於 1024 需要 root 權限
+$http = new Swoole\Http\Server('0.0.0.0', 9000);
+
+$http->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) {
+    /**
+     * @var \Illuminate\Foundation\Application $app
+     * @var \Illuminate\Contracts\Http\Kernel $kernel
+     * @var \Illuminate\Http\Request $laravelRequest
+     * @var \Illuminate\Http\Response $laravelResponse
+     * /
+    $app = require dirname(__DIR__).'/bootstrap/app.php';
+    $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+    $laravelResponse = $kernel->handle(
+        $laravelRequest = new \Illuminate\Http\Request(
+            $request->get ?? [],
+            $request->post ?? [],
+            [],
+            $request->cookie ?? [],
+            $request->files ?? [],
+            $request->server ?? []
+        )
+    );
+
+    $kernel->terminate($laravelRequest, $laravelResponse);
+    $response->status($laravelResponse->getStatusCode());
+    $response->write($laravelResponse->getContent());
+
+    unset(
+        $app,
+        $kernel,
+        $laravelResponse,
+        $laravelRequest
+    );
+    //*/
+    $response->status(200);
+    $response->write("Well done, swoole in docker.");
+});
+
+$http->start();
