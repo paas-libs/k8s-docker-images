@@ -8,7 +8,8 @@ RUN buildDeps='git libzip-dev' \
   && php -r "readfile('https://getcomposer.org/installer');" > /root/composer-installer.php \
   && php /root/composer-installer.php --install-dir=/usr/local/bin --filename=composer \
   && rm -f /root/composer-installer.php \
-  && composer config -g repo.packagist composer https://packagist.phpcomposer.com
+  && composer config -g repo.packagist composer https://packagist.phpcomposer.com \
+  && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
 
 RUN echo "extension=swoole.so" >> /usr/local/etc/php/php.ini \
   && echo "error_log=/var/log/php.log" >> /usr/local/etc/php/php.ini \

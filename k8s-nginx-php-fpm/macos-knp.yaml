@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: bg5hfc/nginx:np-alpine
+        image: bg5hfc/nginx:knp
         ports:
         - name: http-port
           containerPort: 80
@@ -37,7 +37,7 @@ spec:
         - name: project-base
           mountPath: /project-base
       - name: php-fpm
-        image: bg5hfc/php:np-alpine
+        image: bg5hfc/php:knp
         ports:
         - containerPort: 9000
         volumeMounts:

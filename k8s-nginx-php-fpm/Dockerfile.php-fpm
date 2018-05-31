@@ -1,11 +1,71 @@
-FROM php:fpm-alpine
+FROM php:fpm
 
 LABEL maintainer="Lex Lee <bg5hfc@gmail.com>"
 
-RUN docker-php-ext-install pdo_mysql
+RUN apt-get update \
+  && apt-get install -y libpng-dev \
+  && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+  && docker-php-ext-install bcmath exif gettext pdo_mysql sockets gd \
+  && apt-get purge -y --auto-remove libpng-dev \
+  && rm -r /var/lib/apt/lists/*
 
 COPY ./php.ini /usr/local/etc/php
 
 EXPOSE 9000
 
 CMD ["php-fpm"]
+
+# total: bcmath bz2 calendar ctype curl dba dom enchant exif fileinfo filter ftp gd gettext gmp hash iconv imap interbase intl json ldap 
+# mbstring mysqli oci8 odbc opcache pcntl pdo pdo_dblib pdo_firebird pdo_mysql pdo_oci pdo_odbc pdo_pgsql pdo_sqlite pgsql phar posix pspell 
+# readline recode reflection session shmop simplexml snmp soap sockets sodium spl standard sysvmsg sysvsem sysvshm tidy tokenizer wddx xml 
+# xmlreader xmlrpc xmlwriter xsl zend_test zip
+#
+# ready2install: dba exif gettext mysqli opcache pcntl pdo_mysql shmop sockets sysvmsg sysvsem sysvshm zend_test
+# installed: ctype fileinfo hash iconv json mbstring pdo posix session tokenizer
+# failed: 
+# bz2(BZip2) curl(cURL) dom(libxml2) enchant(enchant) filter(modules) ftp(openssl) gd(png.h, jpeg.h) gmp(gmp.h) 
+# imap(utf8_mime2text() has new signature, but U8T_CANONICAL) interbase(libfbclient, libgds or libib_util)
+# intl(ICU) ldap(ldap.h) oci8(Oracle) odbc(ODBC) pdo_dblib(FreeTDS) pdo_firebird(libfbclient, libgds or libib_util)
+# pdo_oci(Oracle Instant Client) pdo_odbc(ODBC) pdo_pgsql(libpq-fe.h) pdo_sqlite(sqlite3) pgsql(PostgreSQL)
+# phar(openssl/evp.h) pspell(pspell) readline(libedit) recode(recode.h) reflection(modules/*) simplexml(libxml2) 
+# snmp(net-snmp-config) soap(libxml2) sodium(libsodium) spl(modules/*) standard(argon2) tidy(libtidy) wddx(libxml2) 
+# xml xmlreader xmlrpc xmlwriter(libxml2) xsl(xslt-config libxslt) zip(ZLIB)
+
+# DB:
+#   interbase pdo_firebird(libfbclient, libgds or libib_util)
+#   oci8 pdo_oci(Oracle)
+#   pgsql pdo_pgsql(PostgreSQL libpq-fe.h)
+#   pdo_dblib(FreeTDS)
+#   odbc pdo_odbc(ODBC)
+#   pdo_sqlite(sqlite3)
+# Mail:
+#   imap(utf8_mime2text() has new signature, but U8T_CANONICAL) 
+#   snmp(net-snmp-config) 
+# Compress:
+#   bz2(BZip2) zip(ZLIB)
+# 
+# enchant(enchant) intl(ICU) ldap(ldap.h) pspell(pspell) readline(libedit) 
+# recode(recode.h) sodium(libsodium) standard(argon2) tidy(libtidy) xsl(libxslt)
+
+# --- 
+
+# core-included: filter reflection spl
+# preinstalled: ctype fileinfo hash iconv json mbstring pdo posix session tokenizer
+
+# apt-get install -y libxml2-dev:
+#   docker-php-ext-install dom simplexml soap wddx xml xmlrpc xmlwriter 
+#   CFLAGS="-I/usr/src/php" docker-php-ext-install xmlreader
+
+# apt-get install -y libcurl4-openssl-dev
+#   docker-php-ext-install curl
+
+# apt-get install -y libgmp-dev
+#   docker-php-ext-install gmp
+
+# apt-get install -y libssh-dev
+#   docker-php-ext-install ftp phar
+
+# apt-get install -y libpng-dev
+#   docker-php-ext-install gd
+
+
