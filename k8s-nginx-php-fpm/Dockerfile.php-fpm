@@ -3,11 +3,16 @@ FROM php:fpm
 LABEL maintainer="Lex Lee <bg5hfc@gmail.com>"
 
 RUN apt-get update \
-  && apt-get install -y libpng-dev \
-  && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+  && apt-get install -y libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+  && docker-php-ext-configure gd \
+    --with-gd \
+    --with-freetype-dir=/usr/include/ \
+    --with-png-dir=/usr/include/ \
+    --with-jpeg-dir=/usr/include/ \
   && docker-php-ext-install bcmath exif gettext pdo_mysql sockets gd \
-  && apt-get purge -y --auto-remove libpng-dev \
-  && rm -r /var/lib/apt/lists/*
+  && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
+#  && rm -r /var/lib/apt/lists/*
+
 
 COPY ./php.ini /usr/local/etc/php
 
@@ -67,5 +72,4 @@ CMD ["php-fpm"]
 
 # apt-get install -y libpng-dev
 #   docker-php-ext-install gd
-
 
